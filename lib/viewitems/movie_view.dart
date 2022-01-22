@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/data/vos/movie_vo.dart';
+import 'package:movie_app/network/api_constants.dart';
 import 'package:movie_app/resources/dimens.dart';
 import 'package:movie_app/widgets/rating_view.dart';
 
 class MovieView extends StatelessWidget {
   final Function movieOnTap;
-  const MovieView(this.movieOnTap, {Key? key}) : super(key: key);
+  final MovieVO? movie;
+  const MovieView(this.movieOnTap, {required this.movie, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,7 @@ class MovieView extends StatelessWidget {
               movieOnTap();
             },
             child: Image.network(
-              'https://media.elcinema.com/uploads/_315x420_98e60fdd40fdae76bda6476dc2b0671b9833c1db655a53d45ad37cc3f5745ccf.jpg',
+              '$IMAGE_BASE_URL${movie?.posterPath}',
               fit: BoxFit.fill,
               height: MOVIE_VIEW_HEIGHT,
             ),
@@ -27,9 +31,9 @@ class MovieView extends StatelessWidget {
           const SizedBox(
             height: MARGIN_MEDIUM,
           ),
-          const Text(
-            'The Longest Day',
-            style: TextStyle(
+          Text(
+            movie?.title ?? '',
+            style: const TextStyle(
                 color: Colors.white,
                 fontSize: TEXT_REGULAR_2x,
                 fontWeight: FontWeight.w500),
