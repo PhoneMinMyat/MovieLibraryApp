@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/data/vos/movie_vo.dart';
+import 'package:movie_app/network/api_constants.dart';
 import 'package:movie_app/resources/dimens.dart';
 import 'package:movie_app/widgets/play_button_view.dart';
 import 'package:movie_app/widgets/title_text.dart';
 
 class ShowCaseViewItem extends StatelessWidget {
-  const ShowCaseViewItem({Key? key}) : super(key: key);
+  final MovieVO movie;
+  const ShowCaseViewItem({required this.movie, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +18,7 @@ class ShowCaseViewItem extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image.network(
-              'https://images-na.ssl-images-amazon.com/images/S/pv-target-images/81f630300cf9006de9041c854439073ddecc6eac6db9bc0a1512b439648a478d._UY500_UX667_RI_V_TTW_.jpg',
+              '$IMAGE_BASE_URL${movie.backdropPath}',
               fit: BoxFit.cover,
             ),
           ),
@@ -30,10 +33,10 @@ class ShowCaseViewItem extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children:  [
                   Text(
-                    'Passengers',
-                    style: TextStyle(
+                    movie.title ?? '',
+                    style:const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                         fontSize: TEXT_REGULAR_3x),
@@ -41,7 +44,7 @@ class ShowCaseViewItem extends StatelessWidget {
                   SizedBox(
                     height: MARGIN_MEDIUM,
                   ),
-                  TitleText(text: '15 DECEMBER 2016')
+                  TitleText(text: movie.releaseDate ?? '')
                 ],
               ),
             ),

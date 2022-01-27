@@ -45,6 +45,7 @@ class MovieDetailsPage extends StatelessWidget {
                   titleText: MOVIE_DETAIL_SCREEN_ACTORS_SECTION_TITLE,
                   seeMoreText: '',
                   isSeeMoreVisible: false,
+                  actorList: [],
                 ),
                 const SizedBox(
                   height: MARGIN_LARGE,
@@ -55,7 +56,7 @@ class MovieDetailsPage extends StatelessWidget {
                 ),
                 const ActorsAndCreatorsView(
                   titleText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_TITLE,
-                  seeMoreText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_SEE_MORE,
+                  seeMoreText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_SEE_MORE,actorList: [],
                 ),
               ]),
             ),
@@ -134,7 +135,7 @@ class AboutFilmInfoView extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
+        SizedBox(
           width: MediaQuery.of(context).size.width / 4,
           child: Text(
             infoText,

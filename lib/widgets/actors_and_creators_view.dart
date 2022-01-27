@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/data/vos/actor_vo.dart';
 import 'package:movie_app/resources/color.dart';
 import 'package:movie_app/resources/dimens.dart';
 import 'package:movie_app/viewitems/best_actor_view.dart';
@@ -7,10 +8,11 @@ import 'package:movie_app/widgets/title_with_underlined_see_more_text_view.dart'
 class ActorsAndCreatorsView extends StatelessWidget {
   final String titleText;
   final String seeMoreText;
+  final List<ActorVO>? actorList;
   final bool isSeeMoreVisible;
   const ActorsAndCreatorsView(
       {required this.titleText,
-      required this.seeMoreText,
+      required this.seeMoreText,required this.actorList,
       this.isSeeMoreVisible = true,
       Key? key})
       : super(key: key);
@@ -33,17 +35,12 @@ class ActorsAndCreatorsView extends StatelessWidget {
           const SizedBox(
             height: MARGIN_MEDIUM_2x,
           ),
-          Container(
+          SizedBox(
             height: MOVIE_VIEW_HEIGHT,
             child: ListView(
               padding: const EdgeInsets.only(left: MARGIN_MEDIUM_2x),
               scrollDirection: Axis.horizontal,
-              children: const [
-                BestActorViewItem(),
-                BestActorViewItem(),
-                BestActorViewItem(),
-                BestActorViewItem(),
-              ],
+              children: actorList?.map((actor) => BestActorViewItem(actor: actor,)).toList() ?? []
             ),
           ),
         ],

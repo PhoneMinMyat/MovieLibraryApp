@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/data/vos/movie_vo.dart';
+import 'package:movie_app/network/api_constants.dart';
 
 import 'package:movie_app/resources/dimens.dart';
 import 'package:movie_app/widgets/gradient_view.dart';
 import 'package:movie_app/widgets/play_button_view.dart';
 
 class BannerView extends StatelessWidget {
-  const BannerView({Key? key}) : super(key: key);
+  final MovieVO? movie;
+  const BannerView({required this.movie,Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: const [
+      children:  [
         Positioned.fill(
-          child: BannerImageView(),
+          child: BannerImageView(imageUrl: movie?.backdropPath ?? '',),
         ),
-        Positioned.fill(
+       const  Positioned.fill(
           child: GradientView(),
         ),
         Align(
           alignment: Alignment.bottomLeft,
-          child: BannerTitleSectionView(),
+          child: BannerTitleSectionView( title:  movie?.title ?? '',),
         ),
-        Align(
+        const Align(
           alignment: Alignment.center,
           child: PlayButtonView(),
         )
@@ -33,7 +36,8 @@ class BannerView extends StatelessWidget {
 
 
 class BannerTitleSectionView extends StatelessWidget {
-  const BannerTitleSectionView({
+  final String title;
+  const BannerTitleSectionView({required this.title,
     Key? key,
   }) : super(key: key);
 
@@ -44,15 +48,15 @@ class BannerTitleSectionView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children:  [
           Text(
-            'The Wolverine 2013.',
-            style: TextStyle(
+            title,
+            style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w500,
                 fontSize: TEXT_HEADING),
           ),
-          Text(
+        const  Text(
             'Official Review',
             style: TextStyle(
                 color: Colors.white,
@@ -66,14 +70,14 @@ class BannerTitleSectionView extends StatelessWidget {
 }
 
 class BannerImageView extends StatelessWidget {
-  const BannerImageView({
-    Key? key,
+  final String imageUrl;
+  const BannerImageView({required this.imageUrl,    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Image.network(
-      'https://static.independent.co.uk/s3fs-public/thumbnails/image/2016/02/25/09/The-Wolverine.jpg?width=1200&auto=webp&quality=75',
+      '$IMAGE_BASE_URL$imageUrl',
       fit: BoxFit.cover,
     );
   }

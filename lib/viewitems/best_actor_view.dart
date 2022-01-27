@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/data/vos/actor_vo.dart';
+import 'package:movie_app/network/api_constants.dart';
 import 'package:movie_app/resources/color.dart';
 import 'package:movie_app/resources/dimens.dart';
 
 class BestActorViewItem extends StatelessWidget {
-  const BestActorViewItem({ Key? key }) : super(key: key);
+  final ActorVO? actor;
+  const BestActorViewItem({required this.actor, Key? key }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -11,17 +14,17 @@ class BestActorViewItem extends StatelessWidget {
       margin: const EdgeInsets.only(right: MARGIN_MEDIUM_2x),
       width: MOVIE_LIST_ITEM_WIDTH,
       child: Stack(
-        children: const [
+        children:  [
           Positioned.fill(
-            child: ActorImageView(),
+            child: ActorImageView(imageUrl: actor?.profilePath ?? '',),
           ),
-          Align(
+         const Align(
             alignment: Alignment.topRight,
             child: FavouriteIconView(),
           ),
           Align(
             alignment: Alignment.bottomLeft,
-            child: ActorNameAndLikeView(),
+            child: ActorNameAndLikeView(actorName: actor?.name ?? '',),
           )
         ],
       ),
@@ -30,14 +33,15 @@ class BestActorViewItem extends StatelessWidget {
 }
 
 class ActorImageView extends StatelessWidget {
-  const ActorImageView({
+  final String imageUrl;
+  const ActorImageView({required this.imageUrl,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Image.network(
-      'https://images.squarespace-cdn.com/content/v1/5f58b0094108a94a07e7dbd2/1632133685347-ZUAF7GIW5G6Z3JCRSKDE/LDC+Image+for+web.jpg',
+      '$IMAGE_BASE_URL$imageUrl',
       fit: BoxFit.cover,
     );
   }
@@ -61,7 +65,8 @@ class FavouriteIconView extends StatelessWidget {
 }
 
 class ActorNameAndLikeView extends StatelessWidget {
-  const ActorNameAndLikeView({
+  final String actorName;
+  const ActorNameAndLikeView({required this.actorName,
     Key? key,
   }) : super(key: key);
 
@@ -74,9 +79,9 @@ class ActorNameAndLikeView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Leonardo DiCaprio',
-            style: TextStyle(
+           Text(
+            actorName,
+            style:const TextStyle(
                 color: Colors.white,
                 fontSize: TEXT_REGULAR,
                 fontWeight: FontWeight.bold),

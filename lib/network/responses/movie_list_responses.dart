@@ -2,10 +2,10 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:movie_app/data/vos/date_vo.dart';
 import 'package:movie_app/data/vos/movie_vo.dart';
 
-part 'get_now_playing_responses.g.dart';
+part 'movie_list_responses.g.dart';
 
 @JsonSerializable()
-class GetNowPlayingResponses {
+class MovieListResponses {
   @JsonKey(name: 'dates')
   DateVO? dates;
   @JsonKey(name: 'page')
@@ -14,14 +14,14 @@ class GetNowPlayingResponses {
   List<MovieVO>? results;
 
 
-  GetNowPlayingResponses({
+  MovieListResponses({
     this.dates,
     this.page,
     this.results,
   });
 
-factory GetNowPlayingResponses.fromJson(Map<String, dynamic> json) => _$GetNowPlayingResponsesFromJson(json);
+factory MovieListResponses.fromJson(Map<String, dynamic> json) => _$MovieListResponsesFromJson(json);
 
-   Map<String, dynamic> toJson() => _$GetNowPlayingResponsesToJson(this);
+   Map<String, dynamic> toJson() => _$MovieListResponsesToJson(this);
 
 }

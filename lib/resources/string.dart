@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 const HOMEPAGE_APPBAR_TITLE = 'Discover';
 const HOMEPAGE_BEST_POPULAR_FILMS_AND_SERIALS = 'BEST POPULAR FILMS AND SERIALS';
 const HOMEPAGE_CHECK_MOVIE_SHOW_TIME = 'Check Movie\nShowtimes';

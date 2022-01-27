@@ -1,14 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'get_now_playing_responses.dart';
+part of 'movie_list_responses.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-GetNowPlayingResponses _$GetNowPlayingResponsesFromJson(
-        Map<String, dynamic> json) =>
-    GetNowPlayingResponses(
+MovieListResponses _$MovieListResponsesFromJson(Map<String, dynamic> json) =>
+    MovieListResponses(
       dates: json['dates'] == null
           ? null
           : DateVO.fromJson(json['dates'] as Map<String, dynamic>),
@@ -18,8 +17,7 @@ GetNowPlayingResponses _$GetNowPlayingResponsesFromJson(
           .toList(),
     );
 
-Map<String, dynamic> _$GetNowPlayingResponsesToJson(
-        GetNowPlayingResponses instance) =>
+Map<String, dynamic> _$MovieListResponsesToJson(MovieListResponses instance) =>
     <String, dynamic>{
       'dates': instance.dates,
       'page': instance.page,

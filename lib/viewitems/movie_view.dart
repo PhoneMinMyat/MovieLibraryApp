@@ -23,7 +23,7 @@ class MovieView extends StatelessWidget {
               movieOnTap();
             },
             child: Image.network(
-              '$IMAGE_BASE_URL${movie?.posterPath}',
+              '$IMAGE_BASE_URL${movie?.posterPath ?? ""}',
               fit: BoxFit.fill,
               height: MOVIE_VIEW_HEIGHT,
             ),
