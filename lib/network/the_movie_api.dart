@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:movie_app/data/vos/movie_vo.dart';
 import 'package:movie_app/network/api_constants.dart';
+import 'package:movie_app/network/responses/get_credit_by_movie_responses.dart';
 import 'package:movie_app/network/responses/get_genres_responses.dart';
 import 'package:movie_app/network/responses/movie_list_responses.dart';
 import 'package:movie_app/network/responses/get_actors_responses.dart';
@@ -47,5 +49,17 @@ abstract class TheMovieApi {
     @Query(PARAM_GENRE_ID) String genreId,
     @Query(PARAM_API_KEY) String apiKey,
     @Query(PARAM_LANGUAGE) String language,
+  );
+
+  @GET('$ENDPOINTS_GET_MOVIE_DETAILS/{movie_id}')
+  Future<MovieVO> getMovieDetails(
+    @Path('movie_id') String movieId,
+    @Query(PARAM_API_KEY) String apiKey,
+  );
+
+  @GET('/3/movie/{movie_id}/credits')
+  Future<GetCreditByMovieResponses> getCreditByMovie(
+    @Path('movie_id') String movieId,
+    @Query(PARAM_API_KEY) String apiKey,
   );
 }

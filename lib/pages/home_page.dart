@@ -118,26 +118,28 @@ class _HomePageState extends State<HomePage> {
                   movieList: popularMovieList?.take(5).toList() ?? []),
               const SizedBox(height: MARGIN_MEDIUM_2x),
               BestPopularFilmsAndSerialsSectionView(
-                () => navigationToMovieDetailsPage(context),
+                (movieId) => navigationToMovieDetailsPage(context, movieId),
                 getNowPlayingMovieList: nowPlayingMovieList,
               ),
               const SizedBox(height: MARGIN_MEDIUM_2x),
               const CheckMovieShowTimeSectionView(),
               const SizedBox(height: MARGIN_LARGE),
               GenreSectionView(
-                () => navigationToMovieDetailsPage(context),
+                (movieId) => navigationToMovieDetailsPage(context, movieId),
                 genreList: genresList,
                 movieList: moviesByGenreList,
-                chooseGenre: (genreId){
-                  if(genreId != null){
+                chooseGenre: (genreId) {
+                  if (genreId != null) {
                     _getMovieByGenre(genreId);
                   }
                 },
               ),
               const SizedBox(height: MARGIN_LARGE),
-               ShowCaseSectionView(movieList: topRatedMovieList ?? [],),
+              ShowCaseSectionView(
+                movieList: topRatedMovieList ?? [],
+              ),
               const SizedBox(height: MARGIN_LARGE),
-               ActorsAndCreatorsView(
+              ActorsAndCreatorsView(
                 titleText: BEST_ACTOR_TITLE,
                 seeMoreText: BEST_ACTOR_SEE_MORE,
                 actorList: actorsList ?? [],
@@ -150,13 +152,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void navigationToMovieDetailsPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MovieDetailsPage(),
-      ),
-    );
+  void navigationToMovieDetailsPage(BuildContext context, int? movieId) {
+    if (movieId != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MovieDetailsPage(
+            movieId: movieId,
+          ),
+        ),
+      );
+    }
   }
 }
 
@@ -239,13 +245,16 @@ class ShowCaseSectionView extends StatelessWidget {
 
 class GenreSectionView extends StatelessWidget {
   const GenreSectionView(this.movieOnTap,
-      {required this.genreList, required this.movieList, required this.chooseGenre, Key? key})
+      {required this.genreList,
+      required this.movieList,
+      required this.chooseGenre,
+      Key? key})
       : super(key: key);
 
   final List<GenreVO>? genreList;
   final List<MovieVO>? movieList;
-  final Function movieOnTap;
-  final Function(int? genreId) chooseGenre;
+  final Function(int?) movieOnTap;
+  final Function(int?) chooseGenre;
 
   @override
   Widget build(BuildContext context) {
@@ -267,9 +276,9 @@ class GenreSectionView extends StatelessWidget {
                           ))
                       .toList() ??
                   [],
-                  onTap: (index){
-                    chooseGenre(genreList?[index].id ?? 0);
-                  },
+              onTap: (index) {
+                chooseGenre(genreList?[index].id ?? 0);
+              },
             ),
           ),
         ),
@@ -278,7 +287,7 @@ class GenreSectionView extends StatelessWidget {
           padding: const EdgeInsets.only(
               top: MARGIN_MEDIUM_2x, bottom: MARGIN_MEDIUM_2x),
           child: HorizontalMovieListView(
-            () => movieOnTap(),
+            (movieId) => movieOnTap(movieId),
             movieList: movieList,
           ),
         ),
@@ -288,7 +297,7 @@ class GenreSectionView extends StatelessWidget {
 }
 
 class BestPopularFilmsAndSerialsSectionView extends StatelessWidget {
-  final Function movieOnTap;
+  final Function(int?) movieOnTap;
   final List<MovieVO>? getNowPlayingMovieList;
   const BestPopularFilmsAndSerialsSectionView(
     this.movieOnTap, {
@@ -309,7 +318,7 @@ class BestPopularFilmsAndSerialsSectionView extends StatelessWidget {
           height: MARGIN_MEDIUM_2x,
         ),
         HorizontalMovieListView(
-          () => movieOnTap(),
+          (movieId) => movieOnTap(movieId),
           movieList: getNowPlayingMovieList,
         ),
       ],
@@ -318,7 +327,7 @@ class BestPopularFilmsAndSerialsSectionView extends StatelessWidget {
 }
 
 class HorizontalMovieListView extends StatelessWidget {
-  final Function movieOnTap;
+  final Function(int?) movieOnTap;
   final List<MovieVO>? movieList;
   const HorizontalMovieListView(
     this.movieOnTap, {
@@ -336,9 +345,11 @@ class HorizontalMovieListView extends StatelessWidget {
                 itemCount: movieList?.length ?? 0,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (BuildContext context, int index) {
-                  return MovieView(
-                    () => movieOnTap(),
-                    movie: movieList?[index],
+                  return GestureDetector(
+                    onTap: () => movieOnTap(movieList?[index].id),
+                    child: MovieView(
+                      movie: movieList?[index],
+                    ),
                   );
                 }),
           )
@@ -382,7 +393,9 @@ class _BannerSectionViewState extends State<BannerSectionView> {
           ),
         ),
         DotsIndicator(
-          dotsCount: widget.movieList?.length ?? 1,
+          dotsCount: (widget.movieList?.length == 0)
+              ? 1
+              : widget.movieList?.length ?? 1,
           position: _position,
           decorator: const DotsDecorator(
             color:

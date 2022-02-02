@@ -5,9 +5,8 @@ import 'package:movie_app/resources/dimens.dart';
 import 'package:movie_app/widgets/rating_view.dart';
 
 class MovieView extends StatelessWidget {
-  final Function movieOnTap;
   final MovieVO? movie;
-  const MovieView(this.movieOnTap, {required this.movie, Key? key})
+  const MovieView( {required this.movie, Key? key})
       : super(key: key);
 
   @override
@@ -18,15 +17,10 @@ class MovieView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () {
-              movieOnTap();
-            },
-            child: Image.network(
-              '$IMAGE_BASE_URL${movie?.posterPath ?? ""}',
-              fit: BoxFit.fill,
-              height: MOVIE_VIEW_HEIGHT,
-            ),
+          Image.network(
+            '$IMAGE_BASE_URL${movie?.posterPath ?? ""}',
+            fit: BoxFit.fill,
+            height: MOVIE_VIEW_HEIGHT,
           ),
           const SizedBox(
             height: MARGIN_MEDIUM,
@@ -39,18 +33,18 @@ class MovieView extends StatelessWidget {
                 fontWeight: FontWeight.w500),
           ),
           Row(
-            children: const [
+            children:  [
               Text(
-                '7.8',
-                style: TextStyle(
+                movie?.voteAverage.toString() ?? '',
+                style: const TextStyle(
                     color: Colors.white,
                     fontSize: TEXT_REGULAR,
                     fontWeight: FontWeight.bold),
               ),
-              SizedBox(
+              const SizedBox(
                 width: MARGIN_MEDIUM,
               ),
-              RatingView(),
+              RatingView(rating: movie?.voteAverage ?? 0,),
             ],
           )
         ],

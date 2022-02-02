@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/data/models/movie_model.dart';
+import 'package:movie_app/data/models/movie_model_impl.dart';
+import 'package:movie_app/data/vos/actor_vo.dart';
+import 'package:movie_app/data/vos/movie_vo.dart';
+import 'package:movie_app/network/api_constants.dart';
 
 import 'package:movie_app/resources/color.dart';
 import 'package:movie_app/resources/dimens.dart';
@@ -8,15 +13,42 @@ import 'package:movie_app/widgets/gradient_view.dart';
 import 'package:movie_app/widgets/rating_view.dart';
 import 'package:movie_app/widgets/title_text.dart';
 
-class MovieDetailsPage extends StatelessWidget {
-  final List<String> genreList = [
-    'War',
-    'History',
-    'Classic',
-    'Action',
-    'World War II'
-  ];
-  MovieDetailsPage({Key? key}) : super(key: key);
+class MovieDetailsPage extends StatefulWidget {
+  final int movieId;
+
+  const MovieDetailsPage({required this.movieId, Key? key}) : super(key: key);
+
+  @override
+  State<MovieDetailsPage> createState() => _MovieDetailsPageState();
+}
+
+class _MovieDetailsPageState extends State<MovieDetailsPage> {
+  final MovieModel _movieModel = MovieModelImpl();
+
+  //State Variables
+  MovieVO? movie;
+  List<ActorVO>? cast;
+  List<ActorVO>? crew;
+
+  @override
+  void initState() {
+    //movie
+    _movieModel.getMovieDetails(widget.movieId)?.then((movie) {
+      setState(() {
+        this.movie = movie;
+      });
+    }).catchError((error) => print(error));
+
+    //ActorAndCrew
+    _movieModel.getCreditByMovie(widget.movieId).then((actorAndCrew) {
+      setState(() {
+        cast = actorAndCrew.first;
+        crew = actorAndCrew[1];
+      });
+    }).catchError((error) => print(error));
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,38 +57,45 @@ class MovieDetailsPage extends StatelessWidget {
         color: HOME_SCREEN_BACKGROUND_COLOR,
         child: CustomScrollView(
           slivers: [
-            MovieDetailSliverAppBarSectionView(() {
-              Navigator.pop(context);
-            }),
+            MovieDetailSliverAppBarSectionView(
+              () {
+                Navigator.pop(context);
+              },
+              movie: movie,
+            ),
             SliverList(
-
               delegate: SliverChildListDelegate([
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
                   child: TrailerSection(
-                    genreList: genreList,
+                    genreList: movie?.getGenreListAsStringList() ?? [],
+                    storyLine: movie?.overview ?? '',
+                    runtime: movie?.getRunTimeAsFormattedString() ?? '',
                   ),
                 ),
                 const SizedBox(
                   height: MARGIN_MEDIUM_2x,
                 ),
-                const ActorsAndCreatorsView(
+                ActorsAndCreatorsView(
                   titleText: MOVIE_DETAIL_SCREEN_ACTORS_SECTION_TITLE,
                   seeMoreText: '',
                   isSeeMoreVisible: false,
-                  actorList: [],
+                  actorList: cast,
                 ),
                 const SizedBox(
                   height: MARGIN_LARGE,
                 ),
-                const AboutInfoSectionView(),
+                AboutInfoSectionView(
+                  movie: movie,
+                ),
                 const SizedBox(
                   height: MARGIN_LARGE,
                 ),
-                const ActorsAndCreatorsView(
+                ActorsAndCreatorsView(
                   titleText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_TITLE,
-                  seeMoreText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_SEE_MORE,actorList: [],
+                  seeMoreText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_SEE_MORE,
+                  actorList: crew,
                 ),
               ]),
             ),
@@ -68,7 +107,9 @@ class MovieDetailsPage extends StatelessWidget {
 }
 
 class AboutInfoSectionView extends StatelessWidget {
+  final MovieVO? movie;
   const AboutInfoSectionView({
+    required this.movie,
     Key? key,
   }) : super(key: key);
 
@@ -78,43 +119,50 @@ class AboutInfoSectionView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          TitleText(text: MOVIE_DETAIL_SCREEN_ABOUT_FILM_TITLE),
-          SizedBox(
+        children: [
+          const TitleText(text: MOVIE_DETAIL_SCREEN_ABOUT_FILM_TITLE),
+          const SizedBox(
             height: MARGIN_MEDIUM_2x,
           ),
           AboutFilmInfoView(
             infoText: 'Original Title:',
-            descriptionText: 'The Longest Day',
+            descriptionText: movie?.originalTitle ?? '',
           ),
-          SizedBox(
+          const SizedBox(
             height: MARGIN_MEDIUM_2x,
           ),
           AboutFilmInfoView(
             infoText: 'Type:',
-            descriptionText: 'War, History, Classic',
+            descriptionText: movie?.getGenreAsCommaSeparatedString() ?? '',
           ),
-          SizedBox(
+          const SizedBox(
+            height: MARGIN_MEDIUM_2x,
+          ),
+          AboutFilmInfoView(
+            infoText: 'Company:',
+            descriptionText: movie?.getProductionCompanyAsCommaSeparatedString() ?? '',
+          ),
+          const SizedBox(
             height: MARGIN_MEDIUM_2x,
           ),
           AboutFilmInfoView(
             infoText: 'Production:',
-            descriptionText: 'United Kingdom, USA',
+            descriptionText:
+                movie?.getProductionCountryAsCommaSeparatedString() ?? '',
           ),
-          SizedBox(
+          const SizedBox(
             height: MARGIN_MEDIUM_2x,
           ),
           AboutFilmInfoView(
             infoText: 'Premiere:',
-            descriptionText: '4 October 1962 (USA)',
+            descriptionText: movie?.releaseDate ?? '',
           ),
-          SizedBox(
+          const SizedBox(
             height: MARGIN_MEDIUM_2x,
           ),
           AboutFilmInfoView(
             infoText: 'Description:',
-            descriptionText:
-                'In 1944, the U.S. Army and Allied forces plan a huge invasion landing in Normandy, France. Despite bad weather, General Eisenhower gives the okay and the Allies land at Normandy. General Norma Cota (Robert Mitchum) travels with his men onto Omaha Beach. With much effort, and lost life, they get off the beach, traveling deep into French territory. The German military, due to arrogance, ignorance and a sleeping Adolf Hitler, delay their response to the Allied landing, with crippling results.',
+            descriptionText: movie?.overview ?? '',
           ),
         ],
       ),
@@ -161,10 +209,14 @@ class AboutFilmInfoView extends StatelessWidget {
 
 class TrailerSection extends StatelessWidget {
   final List<String> genreList;
+  final String storyLine;
+  final String runtime;
 
   const TrailerSection({
     Key? key,
     required this.genreList,
+    required this.storyLine,
+    required this.runtime,
   }) : super(key: key);
 
   @override
@@ -172,11 +224,16 @@ class TrailerSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        MovieTimeAndGenreSection(genreList: genreList),
+        MovieTimeAndGenreSection(
+          genreList: genreList,
+          runtime: runtime,
+        ),
         const SizedBox(
           height: MARGIN_MEDIUM_3x,
         ),
-        const StorylineView(),
+        StorylineView(
+          storyLineText: storyLine,
+        ),
         const SizedBox(
           height: MARGIN_MEDIUM_2x,
         ),
@@ -253,7 +310,9 @@ class MovieDetailsScreenButtonView extends StatelessWidget {
 }
 
 class StorylineView extends StatelessWidget {
+  final String storyLineText;
   const StorylineView({
+    required this.storyLineText,
     Key? key,
   }) : super(key: key);
 
@@ -261,14 +320,15 @@ class StorylineView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        TitleText(text: MOVIE_DETAIL_SCREEN_STORYLINE_TITLE),
-        SizedBox(
+      children: [
+        const TitleText(text: MOVIE_DETAIL_SCREEN_STORYLINE_TITLE),
+        const SizedBox(
           height: MARGIN_MEDIUM,
         ),
         Text(
-          'Shot in a docudrama style (with captions identifying the different participants), the film opens in the days leading up to D-Day, concentrating on events on both sides of the English channel. The Allies wait for a break in the poor weather while anticipating the reaction of the Axis forces defending northern France. As Supreme Commander of SHAEF, Gen. Dwight Eisenhower makes the decision to go after reviewing the initial bad weather reports and the reports about the divisions within the German High Command as to where an invasion might happen and what should be their response.',
-          style: TextStyle(color: Colors.white, fontSize: TEXT_REGULAR_2x),
+          storyLineText,
+          style:
+              const TextStyle(color: Colors.white, fontSize: TEXT_REGULAR_2x),
         )
       ],
     );
@@ -276,7 +336,9 @@ class StorylineView extends StatelessWidget {
 }
 
 class MovieTimeAndGenreSection extends StatelessWidget {
+  final String runtime;
   const MovieTimeAndGenreSection({
+    required this.runtime,
     Key? key,
     required this.genreList,
   }) : super(key: key);
@@ -288,7 +350,6 @@ class MovieTimeAndGenreSection extends StatelessWidget {
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       alignment: WrapAlignment.start,
-
       children: [
         const Icon(
           Icons.access_time,
@@ -297,9 +358,10 @@ class MovieTimeAndGenreSection extends StatelessWidget {
         const SizedBox(
           width: MARGIN_MEDIUM,
         ),
-        const Text(
-          '2h 58min',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        Text(
+          runtime,
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         const SizedBox(
           width: MARGIN_MEDIUM,
@@ -349,8 +411,10 @@ class GenreChip extends StatelessWidget {
 
 class MovieDetailSliverAppBarSectionView extends StatelessWidget {
   final Function backOnTap;
+  final MovieVO? movie;
   const MovieDetailSliverAppBarSectionView(
     this.backOnTap, {
+    required this.movie,
     Key? key,
   }) : super(key: key);
 
@@ -362,8 +426,10 @@ class MovieDetailSliverAppBarSectionView extends StatelessWidget {
       backgroundColor: PRIMARY_COLOR,
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(children: [
-          const Positioned.fill(
-            child: SliverAppBarMovieImageView(),
+          Positioned.fill(
+            child: SliverAppBarMovieImageView(
+              imageUrl: movie?.backdropPath ?? '',
+            ),
           ),
           const Positioned.fill(child: GradientView()),
           Align(
@@ -382,14 +448,16 @@ class MovieDetailSliverAppBarSectionView extends StatelessWidget {
               child: SearchIconButtonView(),
             ),
           ),
-          const Align(
+          Align(
             alignment: Alignment.bottomLeft,
             child: Padding(
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                   left: MARGIN_MEDIUM_2x,
                   right: MARGIN_MEDIUM_2x,
                   bottom: MARGIN_LARGE),
-              child: MovieDetailPageAppBarInfoView(),
+              child: MovieDetailPageAppBarInfoView(
+                movie: movie,
+              ),
             ),
           )
         ]),
@@ -399,7 +467,9 @@ class MovieDetailSliverAppBarSectionView extends StatelessWidget {
 }
 
 class MovieDetailPageAppBarInfoView extends StatelessWidget {
+  final MovieVO? movie;
   const MovieDetailPageAppBarInfoView({
+    required this.movie,
     Key? key,
   }) : super(key: key);
 
@@ -410,18 +480,24 @@ class MovieDetailPageAppBarInfoView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          children: const [
-            DetailPageAppBarInfoMovieYearView(),
-            Spacer(),
-            DetailPageAppBarInfoRatingView()
+          children: [
+            DetailPageAppBarInfoMovieYearView(
+              yearText: movie?.getReleaseYear() ?? '',
+            ),
+            const Spacer(),
+            DetailPageAppBarInfoRatingView(
+              voteAverage: movie?.voteAverage ?? 0,
+              voteAverageAsString: movie?.getAverageVoteAsCommaVersion() ?? '',
+              voteCount: movie?.voteCount ?? 0,
+            )
           ],
         ),
         const SizedBox(
           height: MARGIN_MEDIUM,
         ),
-        const Text(
-          'The Longest Day',
-          style: TextStyle(
+        Text(
+          movie?.title ?? '',
+          style: const TextStyle(
               color: Colors.white,
               fontSize: TEXT_HEADING_2X,
               fontWeight: FontWeight.bold),
@@ -432,7 +508,13 @@ class MovieDetailPageAppBarInfoView extends StatelessWidget {
 }
 
 class DetailPageAppBarInfoRatingView extends StatelessWidget {
+  final int voteCount;
+  final double voteAverage;
+  final String voteAverageAsString;
   const DetailPageAppBarInfoRatingView({
+    required this.voteCount,
+    required this.voteAverageAsString,
+    required this.voteAverage,
     Key? key,
   }) : super(key: key);
 
@@ -442,20 +524,22 @@ class DetailPageAppBarInfoRatingView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Column(
-          children: const [
-            RatingView(),
-            SizedBox(
+          children: [
+            RatingView(
+              rating: voteAverage,
+            ),
+            const SizedBox(
               height: MARGIN_SMALL,
             ),
-            TitleText(text: '38876 VOTES'),
-            SizedBox(
+            TitleText(text: '$voteCount VOTES'),
+            const SizedBox(
               height: MARGIN_CARD_MEDIUM_2,
             )
           ],
         ),
-        const Text(
-          '9,75',
-          style: TextStyle(
+        Text(
+          voteAverageAsString,
+          style: const TextStyle(
               color: Colors.white,
               fontSize: MOVIE_DETAILS_SCREEN_APP_BAR_FONT_SIZE),
         ),
@@ -465,7 +549,9 @@ class DetailPageAppBarInfoRatingView extends StatelessWidget {
 }
 
 class DetailPageAppBarInfoMovieYearView extends StatelessWidget {
+  final String yearText;
   const DetailPageAppBarInfoMovieYearView({
+    required this.yearText,
     Key? key,
   }) : super(key: key);
 
@@ -477,10 +563,10 @@ class DetailPageAppBarInfoMovieYearView extends StatelessWidget {
           color: PLAYBUTTON_COLOR,
           borderRadius: BorderRadius.circular(MARGIN_LARGE)),
       padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-      child: const Center(
+      child: Center(
         child: Text(
-          '2016',
-          style: TextStyle(
+          yearText,
+          style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: TEXT_REGULAR_2x,
               color: Colors.white),
@@ -532,14 +618,16 @@ class BackButtonView extends StatelessWidget {
 }
 
 class SliverAppBarMovieImageView extends StatelessWidget {
+  final String imageUrl;
   const SliverAppBarMovieImageView({
+    required this.imageUrl,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Image.network(
-      'https://cdn3.volusion.com/bxqxk.xvupj/v/vspfiles/photos/HALFSHEET167-2.jpg?v-cache=1327064021',
+      '$IMAGE_BASE_URL$imageUrl',
       fit: BoxFit.cover,
     );
   }

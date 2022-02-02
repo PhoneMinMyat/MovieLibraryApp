@@ -44,4 +44,14 @@ class MovieModelImpl implements MovieModel {
   Future<List<MovieVO>?> getMoviesByGenre(int genreId) {
     return _dataAgent.getMoviesByGenre(genreId);
   }
+
+  @override
+  Future<List<List<ActorVO>?>> getCreditByMovie(int movieId) {
+    return _dataAgent.getCreditByMovie(movieId);
+  }
+
+  @override
+  Future<MovieVO>? getMovieDetails(int movieId) {
+    return _dataAgent.getMovieDetails(movieId);
+  }
 }
