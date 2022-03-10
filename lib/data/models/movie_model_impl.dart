@@ -102,56 +102,39 @@ class MovieModelImpl extends MovieModel {
   ///Database
 
   @override
-  Stream<List<MovieVO>> getNowPlayingMoviesFromDatabase() {
+  Future<List<MovieVO>> getNowPlayingMoviesFromDatabase() {
     getNowPlayingMovies();
-    return mMovieDao
-        .getAllMoviesEventStream()
-        .startWith(mMovieDao.getNowPlayingMoviesStream())
-        .map((event) => mMovieDao.getNowPlayingMovie());
+    return Future.value(mMovieDao.getNowPlayingMovie());
   }
 
   @override
-  Stream<List<MovieVO>> getPopularMoviesFromDatabase() {
+  Future<List<MovieVO>> getPopularMoviesFromDatabase() {
     getPopularMovies();
-    return mMovieDao
-        .getAllMoviesEventStream()
-        .startWith(mMovieDao.getPopularMoviesStream())
-        .map((event) => mMovieDao.getPopularMovies());
+    return Future.value(mMovieDao.getPopularMovies());
+        
   }
 
   @override
-  Stream<List<MovieVO>> getTopRatedMoviesFromDatabase() {
+  Future<List<MovieVO>> getTopRatedMoviesFromDatabase() {
     getTopRatedMovies();
-    return mMovieDao
-        .getAllMoviesEventStream()
-        .startWith(mMovieDao.getTopRatedMoviesStream())
-        .map((event) => mMovieDao.getTopRatedMovies());
+    return Future.value(mMovieDao.getTopRatedMovies());
   }
 
   @override
-  Stream<List<ActorVO>> getActorsFromDatabase() {
+  Future<List<ActorVO>> getActorsFromDatabase() {
     getActors();
-    return mActorDao
-        .getAllActorsEventStream()
-        .startWith(mActorDao.getAllActorsStream())
-        .map((event) => mActorDao.getAllActors());
+    return Future.value(mActorDao.getAllActors());
   }
 
   @override
-  Stream<List<GenreVO>> getGenresFromDatabase() {
+  Future<List<GenreVO>> getGenresFromDatabase() {
     getGenres();
-    return mGenreDao
-        .getGenreEventStream()
-        .startWith(mGenreDao.getAllGenresStream())
-        .map((event) => mGenreDao.getAllGenres());
+    return Future.value(mGenreDao.getAllGenres());
   }
 
   @override
-  Stream<MovieVO?> getMovieDetailsFromDatabase(int movieId) {
+  Future<MovieVO?> getMovieDetailsFromDatabase(int movieId) {
     getMovieDetails(movieId);
-    return mMovieDao
-        .getAllMoviesEventStream()
-        .startWith(mMovieDao.getMovieDetailsByMovieIDStream(movieId))
-        .map((event) => mMovieDao.getSingleMovieById(movieId));
+    return Future.value(mMovieDao.getSingleMovieById(movieId));
   }
 }
