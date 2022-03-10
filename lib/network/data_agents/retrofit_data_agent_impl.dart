@@ -6,7 +6,7 @@ import 'package:movie_app/network/api_constants.dart';
 import 'package:movie_app/network/data_agents/movie_data_agent.dart';
 import 'package:movie_app/network/the_movie_api.dart';
 
-class RetrofitDataAgentImpl extends MovieDataAgent {
+class RetrofitDataAgentImpl implements MovieDataAgent {
   late TheMovieApi mApi;
 
   static final RetrofitDataAgentImpl _singleton =
@@ -77,7 +77,12 @@ class RetrofitDataAgentImpl extends MovieDataAgent {
 
   @override
   Future<List<List<ActorVO>?>> getCreditByMovie(int movieId) {
-    return mApi.getCreditByMovie(movieId.toString(), API_KEY).asStream().map((getCreditByMovieRes) => [getCreditByMovieRes.cast, getCreditByMovieRes.crew]).first;
+    return mApi
+        .getCreditByMovie(movieId.toString(), API_KEY)
+        .asStream()
+        .map((getCreditByMovieRes) =>
+            [getCreditByMovieRes.cast, getCreditByMovieRes.crew])
+        .first;
   }
 
   @override

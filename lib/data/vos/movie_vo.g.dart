@@ -43,13 +43,16 @@ class MovieVOAdapter extends TypeAdapter<MovieVO> {
       spokenLanguage: (fields[23] as List?)?.cast<SpokenLanguageVO>(),
       status: fields[24] as String?,
       tagLine: fields[25] as String?,
+      isNowPlaying: fields[26] as bool?,
+      isPopular: fields[27] as bool?,
+      isTopRated: fields[28] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, MovieVO obj) {
     writer
-      ..writeByte(26)
+      ..writeByte(29)
       ..writeByte(0)
       ..write(obj.adult)
       ..writeByte(1)
@@ -101,7 +104,13 @@ class MovieVOAdapter extends TypeAdapter<MovieVO> {
       ..writeByte(24)
       ..write(obj.status)
       ..writeByte(25)
-      ..write(obj.tagLine);
+      ..write(obj.tagLine)
+      ..writeByte(26)
+      ..write(obj.isNowPlaying)
+      ..writeByte(27)
+      ..write(obj.isPopular)
+      ..writeByte(28)
+      ..write(obj.isTopRated);
   }
 
   @override
@@ -157,6 +166,9 @@ MovieVO _$MovieVOFromJson(Map<String, dynamic> json) => MovieVO(
           .toList(),
       status: json['status'] as String?,
       tagLine: json['tagline'] as String?,
+      isNowPlaying: json['isNowPlaying'] as bool?,
+      isPopular: json['isPopular'] as bool?,
+      isTopRated: json['isTopRated'] as bool?,
     );
 
 Map<String, dynamic> _$MovieVOToJson(MovieVO instance) => <String, dynamic>{
@@ -186,4 +198,7 @@ Map<String, dynamic> _$MovieVOToJson(MovieVO instance) => <String, dynamic>{
       'spoken_languages': instance.spokenLanguage,
       'status': instance.status,
       'tagline': instance.tagLine,
+      'isNowPlaying': instance.isNowPlaying,
+      'isPopular': instance.isPopular,
+      'isTopRated': instance.isTopRated,
     };

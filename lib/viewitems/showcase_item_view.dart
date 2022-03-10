@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movie_app/data/vos/movie_vo.dart';
 import 'package:movie_app/network/api_constants.dart';
 import 'package:movie_app/resources/dimens.dart';
+import 'package:movie_app/widgets/image_network_with_placeholder.dart';
 import 'package:movie_app/widgets/play_button_view.dart';
 import 'package:movie_app/widgets/title_text.dart';
 
@@ -17,10 +18,7 @@ class ShowCaseViewItem extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: Image.network(
-              '$IMAGE_BASE_URL${movie.backdropPath}',
-              fit: BoxFit.cover,
-            ),
+            child: ImageNetworkWithPlaceHolder(imageUrl: '$IMAGE_BASE_URL${movie.backdropPath}')
           ),
           const Align(
             alignment: Alignment.center,

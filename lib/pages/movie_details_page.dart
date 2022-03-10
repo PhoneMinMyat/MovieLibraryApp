@@ -10,45 +10,15 @@ import 'package:movie_app/resources/dimens.dart';
 import 'package:movie_app/resources/string.dart';
 import 'package:movie_app/widgets/actors_and_creators_view.dart';
 import 'package:movie_app/widgets/gradient_view.dart';
+import 'package:movie_app/widgets/image_network_with_placeholder.dart';
 import 'package:movie_app/widgets/rating_view.dart';
 import 'package:movie_app/widgets/title_text.dart';
+import 'package:scoped_model/scoped_model.dart';
 
-class MovieDetailsPage extends StatefulWidget {
+class MovieDetailsPage extends StatelessWidget {
   final int movieId;
 
   const MovieDetailsPage({required this.movieId, Key? key}) : super(key: key);
-
-  @override
-  State<MovieDetailsPage> createState() => _MovieDetailsPageState();
-}
-
-class _MovieDetailsPageState extends State<MovieDetailsPage> {
-  final MovieModel _movieModel = MovieModelImpl();
-
-  //State Variables
-  MovieVO? movie;
-  List<ActorVO>? cast;
-  List<ActorVO>? crew;
-
-  @override
-  void initState() {
-    //movie
-    _movieModel.getMovieDetails(widget.movieId)?.then((movie) {
-      setState(() {
-        this.movie = movie;
-      });
-    }).catchError((error) => print(error));
-
-    //ActorAndCrew
-    _movieModel.getCreditByMovie(widget.movieId).then((actorAndCrew) {
-      setState(() {
-        cast = actorAndCrew.first;
-        crew = actorAndCrew[1];
-      });
-    }).catchError((error) => print(error));
-
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,45 +27,65 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
         color: HOME_SCREEN_BACKGROUND_COLOR,
         child: CustomScrollView(
           slivers: [
-            MovieDetailSliverAppBarSectionView(
-              () {
-                Navigator.pop(context);
+            ScopedModelDescendant<MovieModelImpl>(
+              builder: (context, child, model) {
+                return MovieDetailSliverAppBarSectionView(
+                () {
+                  Navigator.pop(context);
+                },
+                movie: model.mMovie,
+              );
               },
-              movie: movie,
             ),
             SliverList(
               delegate: SliverChildListDelegate([
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-                  child: TrailerSection(
-                    genreList: movie?.getGenreListAsStringList() ?? [],
-                    storyLine: movie?.overview ?? '',
-                    runtime: movie?.getRunTimeAsFormattedString() ?? '',
+                  child: ScopedModelDescendant<MovieModelImpl>(
+                    builder: (context, child, model) {
+                      return TrailerSection(
+                      genreList: model.mMovie?.getGenreListAsStringList() ?? [],
+                      storyLine: model.mMovie?.overview ?? '',
+                      runtime: model.mMovie?.getRunTimeAsFormattedString() ?? '',
+                    );
+                    },
                   ),
                 ),
                 const SizedBox(
                   height: MARGIN_MEDIUM_2x,
                 ),
-                ActorsAndCreatorsView(
-                  titleText: MOVIE_DETAIL_SCREEN_ACTORS_SECTION_TITLE,
-                  seeMoreText: '',
-                  isSeeMoreVisible: false,
-                  actorList: cast,
+                ScopedModelDescendant<MovieModelImpl>(
+                  builder: (context, child, model) {
+                    return ActorsAndCreatorsView(
+                    titleText: MOVIE_DETAIL_SCREEN_ACTORS_SECTION_TITLE,
+                    seeMoreText: '',
+                    isSeeMoreVisible: false,
+                    actorList: model.mCast,
+                  );
+                  },
                 ),
                 const SizedBox(
                   height: MARGIN_LARGE,
                 ),
-                AboutInfoSectionView(
-                  movie: movie,
+                ScopedModelDescendant<MovieModelImpl>(
+                  builder: (context, child, model) {
+                    return AboutInfoSectionView(
+                    movie: model.mMovie,
+                  );
+                  },
                 ),
                 const SizedBox(
                   height: MARGIN_LARGE,
                 ),
-                ActorsAndCreatorsView(
-                  titleText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_TITLE,
-                  seeMoreText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_SEE_MORE,
-                  actorList: crew,
+                ScopedModelDescendant<MovieModelImpl>(
+                  builder: (context, child, model) {
+                    return ActorsAndCreatorsView(
+                    titleText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_TITLE,
+                    seeMoreText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_SEE_MORE,
+                    actorList: model.mCrew,
+                  );
+                  }
                 ),
               ]),
             ),
@@ -140,7 +130,8 @@ class AboutInfoSectionView extends StatelessWidget {
           ),
           AboutFilmInfoView(
             infoText: 'Company:',
-            descriptionText: movie?.getProductionCompanyAsCommaSeparatedString() ?? '',
+            descriptionText:
+                movie?.getProductionCompanyAsCommaSeparatedString() ?? '',
           ),
           const SizedBox(
             height: MARGIN_MEDIUM_2x,
@@ -626,9 +617,8 @@ class SliverAppBarMovieImageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      '$IMAGE_BASE_URL$imageUrl',
-      fit: BoxFit.cover,
+    return ImageNetworkWithPlaceHolder(
+      imageUrl: '$IMAGE_BASE_URL$imageUrl',
     );
   }
 }

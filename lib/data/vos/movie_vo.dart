@@ -116,6 +116,15 @@ class MovieVO {
   @JsonKey(name: 'tagline')
    @HiveField(25)
   String? tagLine;
+
+  @HiveField(26)
+  bool? isNowPlaying;
+
+   @HiveField(27)
+  bool? isPopular;
+
+   @HiveField(28)
+  bool? isTopRated;
   MovieVO({
     this.adult,
     this.backdropPath,
@@ -143,6 +152,9 @@ class MovieVO {
     this.spokenLanguage,
     this.status,
     this.tagLine,
+    this.isNowPlaying,
+    this.isPopular,
+    this.isTopRated,
   });
 
   factory MovieVO.fromJson(Map<String, dynamic> json) =>
