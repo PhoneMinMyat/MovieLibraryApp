@@ -14,16 +14,29 @@ class ActorDao {
   void saveAllActors(List<ActorVO> actorList) async {
     Map<int, ActorVO> actorMap = Map.fromIterable(actorList,
         key: (actor) => actor.id, value: (actor) => actor);
-      await getActorBox().putAll(actorMap);
-      
+    await getActorBox().putAll(actorMap);
   }
 
-  List<ActorVO> getAllActors(){
-    return getActorBox().values.toList();
+  List<ActorVO> getAllActors() {
+    List<ActorVO> actorList = getActorBox().values.toList();
+
+    if (actorList.isNotEmpty) {
+      return actorList;
+    } else {
+      return [];
+    }
   }
 
+  //Reactive
+  Stream<void> getAllActorsEventStream() {
+    return getActorBox().watch();
+  }
 
-  Box<ActorVO> getActorBox(){
+  Stream<List<ActorVO>> getAllActorsStream() {
+    return Stream.value(getAllActors());
+  }
+
+  Box<ActorVO> getActorBox() {
     return Hive.box<ActorVO>(BOX_NAME_ACTOR_VO);
   }
 }

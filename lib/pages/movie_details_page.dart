@@ -27,66 +27,46 @@ class MovieDetailsPage extends StatelessWidget {
         color: HOME_SCREEN_BACKGROUND_COLOR,
         child: CustomScrollView(
           slivers: [
-            ScopedModelDescendant<MovieModelImpl>(
-              builder: (context, child, model) {
-                return MovieDetailSliverAppBarSectionView(
-                () {
-                  Navigator.pop(context);
-                },
-                movie: model.mMovie,
-              );
-              },
-            ),
+            // MovieDetailSliverAppBarSectionView(
+            //     () {
+            //       Navigator.pop(context);
+            //     },
+            //     movie: model.mMovie,
+            //   ),
             SliverList(
               delegate: SliverChildListDelegate([
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-                  child: ScopedModelDescendant<MovieModelImpl>(
-                    builder: (context, child, model) {
-                      return TrailerSection(
-                      genreList: model.mMovie?.getGenreListAsStringList() ?? [],
-                      storyLine: model.mMovie?.overview ?? '',
-                      runtime: model.mMovie?.getRunTimeAsFormattedString() ?? '',
-                    );
-                    },
-                  ),
+                  // child:  TrailerSection(
+                  //     genreList: model.mMovie?.getGenreListAsStringList() ?? [],
+                  //     storyLine: model.mMovie?.overview ?? '',
+                  //     runtime: model.mMovie?.getRunTimeAsFormattedString() ?? '',
+                  //   ),
                 ),
                 const SizedBox(
                   height: MARGIN_MEDIUM_2x,
                 ),
-                ScopedModelDescendant<MovieModelImpl>(
-                  builder: (context, child, model) {
-                    return ActorsAndCreatorsView(
-                    titleText: MOVIE_DETAIL_SCREEN_ACTORS_SECTION_TITLE,
-                    seeMoreText: '',
-                    isSeeMoreVisible: false,
-                    actorList: model.mCast,
-                  );
-                  },
-                ),
+                // ActorsAndCreatorsView(
+                //     titleText: MOVIE_DETAIL_SCREEN_ACTORS_SECTION_TITLE,
+                //     seeMoreText: '',
+                //     isSeeMoreVisible: false,
+                //     actorList: model.mCast,
+                //   ),
                 const SizedBox(
                   height: MARGIN_LARGE,
                 ),
-                ScopedModelDescendant<MovieModelImpl>(
-                  builder: (context, child, model) {
-                    return AboutInfoSectionView(
-                    movie: model.mMovie,
-                  );
-                  },
-                ),
+                // AboutInfoSectionView(
+                //     movie: model.mMovie,
+                //   ),
                 const SizedBox(
                   height: MARGIN_LARGE,
                 ),
-                ScopedModelDescendant<MovieModelImpl>(
-                  builder: (context, child, model) {
-                    return ActorsAndCreatorsView(
-                    titleText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_TITLE,
-                    seeMoreText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_SEE_MORE,
-                    actorList: model.mCrew,
-                  );
-                  }
-                ),
+                // ActorsAndCreatorsView(
+                //     titleText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_TITLE,
+                //     seeMoreText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_SEE_MORE,
+                //     actorList: model.mCrew,
+                //   ),
               ]),
             ),
           ],

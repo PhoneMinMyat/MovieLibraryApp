@@ -12,7 +12,6 @@ import 'package:movie_app/data/vos/production_company_vo.dart';
 import 'package:movie_app/data/vos/spoken_language_vo.dart';
 import 'package:movie_app/pages/home_page.dart';
 import 'package:movie_app/persistence/hive_constants.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -39,16 +38,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ScopedModel(
-      model: MovieModelImpl(),
-      
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const HomePage(),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
+      home: const HomePage(),
     );
   }
 }

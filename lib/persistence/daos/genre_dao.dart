@@ -17,7 +17,21 @@ class GenreDao {
   }
 
   List<GenreVO> getAllGenres(){
-    return getGenreBox().values.toList();
+    List<GenreVO> genreList =getGenreBox().values.toList();
+    if(genreList.isNotEmpty){
+      return genreList;
+    } else{
+      return [];
+    }
+  }
+
+  //Reactive
+  Stream<void> getGenreEventStream(){
+    return getGenreBox().watch();
+  }
+
+  Stream<List<GenreVO>> getAllGenresStream(){
+    return Stream.value(getAllGenres());
   }
 
   Box<GenreVO> getGenreBox(){

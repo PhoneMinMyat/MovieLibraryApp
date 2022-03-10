@@ -78,6 +78,10 @@ class MovieDao {
     return Stream.value(getTopRatedMovies());
   }
 
+  Stream<MovieVO?> getMovieDetailsByMovieIDStream(int movieId) {
+    return Stream.value(getSingleMovieById(movieId));
+  }
+
   Box<MovieVO> getMovieBox() {
     return Hive.box<MovieVO>(BOX_NAME_MOVIE_VO);
   }
