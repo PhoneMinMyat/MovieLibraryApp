@@ -1,5 +1,6 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/bloc/home_bloc.dart';
 import 'package:movie_app/data/models/movie_model.dart';
 import 'package:movie_app/data/models/movie_model_impl.dart';
 import 'package:movie_app/data/vos/actor_vo.dart';
@@ -17,17 +18,15 @@ import 'package:movie_app/widgets/title_text.dart';
 import 'package:movie_app/widgets/title_with_underlined_see_more_text_view.dart';
 import 'package:movie_app/widgets/underlined_seemore_text.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
-  ///Home Page State Variable
-  // List<MovieVO>? mNowPlayingMovieList;
-  // List<MovieVO>? mPopularMovieList;
-  // List<MovieVO>? mTopRatedMovieList;
-  // List<ActorVO>? mActorsList;
-  // List<GenreVO>? mGenresList;
-  // List<MovieVO>? mMoviesByGenreList;
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+ final HomeBloc _bloc = HomeBloc();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,36 +57,66 @@ class HomePage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // BannerSectionView(
-              //     movieList: mPopularMovieList?.take(5).toList() ?? []),
+              StreamBuilder<List<MovieVO>>(
+                stream: _bloc.mPopularMoviesStreamController.stream,
+                builder: (context, snapshot) {
+                  return BannerSectionView(
+                      movieList: snapshot.data?.take(5).toList() ?? []);
+                }
+              ),
               const SizedBox(height: MARGIN_MEDIUM_2x),
-              // BestPopularFilmsAndSerialsSectionView(
-              //   (movieId) => navigationToMovieDetailsPage(context, movieId),
-              //   getNowPlayingMovieList: mNowPlayingMovieList,
-              // ),
+              StreamBuilder<List<MovieVO>>(
+                stream: _bloc.mNowPlayingStreamController.stream,
+                builder: (context, snapshot) {
+                  return BestPopularFilmsAndSerialsSectionView(
+                    (movieId) => navigationToMovieDetailsPage(context, movieId),
+                    getNowPlayingMovieList: snapshot.data,
+                  );
+                }
+              ),
               const SizedBox(height: MARGIN_MEDIUM_2x),
               const CheckMovieShowTimeSectionView(),
               const SizedBox(height: MARGIN_LARGE),
-              // GenreSectionView(
-              //   (movieId) => navigationToMovieDetailsPage(context, movieId),
-              //   genreList: mGenresList,
-              //   movieList: mMoviesByGenreList,
-              //   chooseGenre: (genreId) {
-              //     if (genreId != null) {
-              //       // getMoviesByGenre(genreId);
-              //     }
-              //   },
-              // ),
+              StreamBuilder<List<GenreVO>>(
+                stream: _bloc.mGenreListStreamController.stream,
+                builder: (context, genreListSnapshot) {
+                  return StreamBuilder<List<MovieVO>>(
+                    stream: _bloc.mMoviesByGenreListStreamController.stream,
+                    builder: (context, movieByGenreSnapshot) {
+                      return GenreSectionView(
+                        (movieId) => navigationToMovieDetailsPage(context, movieId),
+                        genreList: genreListSnapshot.data,
+                        movieList: movieByGenreSnapshot.data,
+                        chooseGenre: (genreId) {
+                          if (genreId != null) {
+                            _bloc.onTapGenre(genreId);
+                          }
+                        },
+                      );
+                    }
+                  );
+                }
+              ),
               const SizedBox(height: MARGIN_LARGE),
-              // ShowCaseSectionView(
-              //   movieList: mTopRatedMovieList ?? [],
-              // ),
+              StreamBuilder<List<MovieVO>>(
+                stream: _bloc.mTopRatedStreamController.stream,
+                builder: (context, snapshot) {
+                  return ShowCaseSectionView(
+                    movieList: snapshot.data ?? [],
+                  );
+                }
+              ),
               const SizedBox(height: MARGIN_LARGE),
-              // ActorsAndCreatorsView(
-              //   titleText: BEST_ACTOR_TITLE,
-              //   seeMoreText: BEST_ACTOR_SEE_MORE,
-              //   actorList: mActorsList ?? [],
-              // ),
+              StreamBuilder<List<ActorVO>>(
+                stream: _bloc.mActorListStreamController.stream,
+                builder: (context, snapshot) {
+                  return ActorsAndCreatorsView(
+                    titleText: BEST_ACTOR_TITLE,
+                    seeMoreText: BEST_ACTOR_SEE_MORE,
+                    actorList: snapshot.data ?? [],
+                  );
+                }
+              ),
               //const SizedBox(height: MARGIN_LARGE),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/bloc/movie_details_bloc.dart';
 import 'package:movie_app/data/models/movie_model.dart';
 import 'package:movie_app/data/models/movie_model_impl.dart';
 import 'package:movie_app/data/vos/actor_vo.dart';
@@ -15,63 +16,111 @@ import 'package:movie_app/widgets/rating_view.dart';
 import 'package:movie_app/widgets/title_text.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class MovieDetailsPage extends StatelessWidget {
+class MovieDetailsPage extends StatefulWidget {
   final int movieId;
 
   const MovieDetailsPage({required this.movieId, Key? key}) : super(key: key);
 
   @override
+  State<MovieDetailsPage> createState() => _MovieDetailsPageState();
+}
+
+class _MovieDetailsPageState extends State<MovieDetailsPage> {
+  late MovieDetailsBloc _bloc;
+
+  @override
+  void initState() {
+    _bloc = MovieDetailsBloc(widget.movieId);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: HOME_SCREEN_BACKGROUND_COLOR,
-        child: CustomScrollView(
-          slivers: [
-            // MovieDetailSliverAppBarSectionView(
-            //     () {
-            //       Navigator.pop(context);
-            //     },
-            //     movie: model.mMovie,
-            //   ),
-            SliverList(
-              delegate: SliverChildListDelegate([
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2x),
-                  // child:  TrailerSection(
-                  //     genreList: model.mMovie?.getGenreListAsStringList() ?? [],
-                  //     storyLine: model.mMovie?.overview ?? '',
-                  //     runtime: model.mMovie?.getRunTimeAsFormattedString() ?? '',
-                  //   ),
+      body: StreamBuilder<MovieVO>(
+          stream: _bloc.movieDetailsStreamController.stream.asBroadcastStream(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Container(
+                color: HOME_SCREEN_BACKGROUND_COLOR,
+                child: CustomScrollView(
+                  slivers: [
+                    MovieDetailSliverAppBarSectionView(
+                      () {
+                        Navigator.pop(context);
+                      },
+                      movie: snapshot.data,
+                    ),
+                    SliverList(
+                      delegate: SliverChildListDelegate([
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: MARGIN_MEDIUM_2x),
+                          child: TrailerSection(
+                            genreList:
+                                snapshot.data?.getGenreListAsStringList() ?? [],
+                            storyLine: snapshot.data?.overview ?? '',
+                            runtime:
+                                snapshot.data?.getRunTimeAsFormattedString() ??
+                                    '',
+                          ),
+                        ),
+                        const SizedBox(
+                          height: MARGIN_MEDIUM_2x,
+                        ),
+                        StreamBuilder<List<ActorVO>>(
+                            stream: _bloc.castStreamController.stream
+                                .asBroadcastStream(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData &&
+                                  (snapshot.data?.isNotEmpty ?? false)) {
+                                return ActorsAndCreatorsView(
+                                  titleText:
+                                      MOVIE_DETAIL_SCREEN_ACTORS_SECTION_TITLE,
+                                  seeMoreText: '',
+                                  isSeeMoreVisible: false,
+                                  actorList: snapshot.data,
+                                );
+                              } else {
+                                return Container();
+                              }
+                            }),
+                        const SizedBox(
+                          height: MARGIN_LARGE,
+                        ),
+                        AboutInfoSectionView(
+                          movie: snapshot.data,
+                        ),
+                        const SizedBox(
+                          height: MARGIN_LARGE,
+                        ),
+                        StreamBuilder<List<ActorVO>>(
+                            stream: _bloc.crewStreamController.stream
+                                .asBroadcastStream(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData &&
+                                  (snapshot.data?.isNotEmpty ?? false)) {
+                                    print('Crew contain');
+                                return ActorsAndCreatorsView(
+                                  titleText:
+                                      MOVIE_DETAIL_SCREEN_CREATORS_SECTION_TITLE,
+                                  seeMoreText:
+                                      MOVIE_DETAIL_SCREEN_CREATORS_SECTION_SEE_MORE,
+                                  actorList: snapshot.data,
+                                );
+                              } else {
+                                return Container();
+                              }
+                            }),
+                      ]),
+                    ),
+                  ],
                 ),
-                const SizedBox(
-                  height: MARGIN_MEDIUM_2x,
-                ),
-                // ActorsAndCreatorsView(
-                //     titleText: MOVIE_DETAIL_SCREEN_ACTORS_SECTION_TITLE,
-                //     seeMoreText: '',
-                //     isSeeMoreVisible: false,
-                //     actorList: model.mCast,
-                //   ),
-                const SizedBox(
-                  height: MARGIN_LARGE,
-                ),
-                // AboutInfoSectionView(
-                //     movie: model.mMovie,
-                //   ),
-                const SizedBox(
-                  height: MARGIN_LARGE,
-                ),
-                // ActorsAndCreatorsView(
-                //     titleText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_TITLE,
-                //     seeMoreText: MOVIE_DETAIL_SCREEN_CREATORS_SECTION_SEE_MORE,
-                //     actorList: model.mCrew,
-                //   ),
-              ]),
-            ),
-          ],
-        ),
-      ),
+              );
+            } else {
+              return const CircularProgressIndicator();
+            }
+          }),
     );
   }
 }

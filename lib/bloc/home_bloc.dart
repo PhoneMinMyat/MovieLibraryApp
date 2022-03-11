@@ -26,19 +26,42 @@ class HomeBloc {
 
   HomeBloc() {
     ///Now Playing
-    mMovieModel.getNowPlayingMoviesFromDatabase().listen((movieList) {
+    mMovieModel.getNowPlayingMoviesFromDatabase().then((movieList) {
       mNowPlayingStreamController.sink.add(movieList);
-    }).onError((error) {});
+    }).catchError((error) {});
 
     ///Popular Movies
-    mMovieModel.getPopularMoviesFromDatabase().listen((movieList) {
+    mMovieModel.getPopularMoviesFromDatabase().then((movieList) {
       mPopularMoviesStreamController.sink.add(movieList);
-    }).onError((error) {});
+    }).catchError((error) {});
 
     ///Top rated Movies
-    mMovieModel.getTopRatedMoviesFromDatabase().listen((movieList) {
+    mMovieModel.getTopRatedMoviesFromDatabase().then((movieList) {
       mTopRatedStreamController.sink.add(movieList);
-    }).onError((error) {});
+    }).catchError((error) {});
+
+    ///Genres
+    mMovieModel.getGenresFromDatabase().then((genreList) {
+      mGenreListStreamController.sink.add(genreList);
+
+      ///Movies By Genres
+      _getMoviesByGenreAndRefresh(genreList.first.id ?? -1);
+    }).catchError((error) {});
+
+    ///Actors
+    mMovieModel.getActorsFromDatabase().then((actorList) {
+      mActorListStreamController.sink.add(actorList);
+    }).catchError((error) {});
+  }
+
+  void onTapGenre(int genreId){
+    _getMoviesByGenreAndRefresh(genreId);
+  }
+
+  void _getMoviesByGenreAndRefresh(int genreId) {
+    mMovieModel.getMoviesByGenre(genreId).then((movieList) {
+      mMoviesByGenreListStreamController.sink.add(movieList ?? []);
+    }).catchError((error) {});
   }
 
   void dispose() {
