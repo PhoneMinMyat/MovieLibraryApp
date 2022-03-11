@@ -1,5 +1,6 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/bloc/home_bloc.dart';
 import 'package:movie_app/data/models/movie_model.dart';
 import 'package:movie_app/data/models/movie_model_impl.dart';
 import 'package:movie_app/data/vos/actor_vo.dart';
@@ -16,80 +17,87 @@ import 'package:movie_app/widgets/actors_and_creators_view.dart';
 import 'package:movie_app/widgets/title_text.dart';
 import 'package:movie_app/widgets/title_with_underlined_see_more_text_view.dart';
 import 'package:movie_app/widgets/underlined_seemore_text.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
-  ///Home Page State Variable
-  // List<MovieVO>? mNowPlayingMovieList;
-  // List<MovieVO>? mPopularMovieList;
-  // List<MovieVO>? mTopRatedMovieList;
-  // List<ActorVO>? mActorsList;
-  // List<GenreVO>? mGenresList;
-  // List<MovieVO>? mMoviesByGenreList;
-
+  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: APPBAR_ELEVATION,
-        backgroundColor: PRIMARY_COLOR,
-        centerTitle: true,
-        title: const Text(
-          HOMEPAGE_APPBAR_TITLE,
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.menu),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: MARGIN_MEDIUM_2x),
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.search),
-            ),
+    return ChangeNotifierProvider(
+      create: (context) => HomeBloc(),
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: APPBAR_ELEVATION,
+          backgroundColor: PRIMARY_COLOR,
+          centerTitle: true,
+          title: const Text(
+            HOMEPAGE_APPBAR_TITLE,
+            style: TextStyle(fontWeight: FontWeight.w800),
           ),
-        ],
-      ),
-      body: Container(
-        color: HOME_SCREEN_BACKGROUND_COLOR,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // BannerSectionView(
-              //     movieList: mPopularMovieList?.take(5).toList() ?? []),
-              const SizedBox(height: MARGIN_MEDIUM_2x),
-              // BestPopularFilmsAndSerialsSectionView(
-              //   (movieId) => navigationToMovieDetailsPage(context, movieId),
-              //   getNowPlayingMovieList: mNowPlayingMovieList,
-              // ),
-              const SizedBox(height: MARGIN_MEDIUM_2x),
-              const CheckMovieShowTimeSectionView(),
-              const SizedBox(height: MARGIN_LARGE),
-              // GenreSectionView(
-              //   (movieId) => navigationToMovieDetailsPage(context, movieId),
-              //   genreList: mGenresList,
-              //   movieList: mMoviesByGenreList,
-              //   chooseGenre: (genreId) {
-              //     if (genreId != null) {
-              //       // getMoviesByGenre(genreId);
-              //     }
-              //   },
-              // ),
-              const SizedBox(height: MARGIN_LARGE),
-              // ShowCaseSectionView(
-              //   movieList: mTopRatedMovieList ?? [],
-              // ),
-              const SizedBox(height: MARGIN_LARGE),
-              // ActorsAndCreatorsView(
-              //   titleText: BEST_ACTOR_TITLE,
-              //   seeMoreText: BEST_ACTOR_SEE_MORE,
-              //   actorList: mActorsList ?? [],
-              // ),
-              //const SizedBox(height: MARGIN_LARGE),
-            ],
+          leading: IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.menu),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: MARGIN_MEDIUM_2x),
+              child: IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.search),
+              ),
+            ),
+          ],
+        ),
+        body: Container(
+          color: HOME_SCREEN_BACKGROUND_COLOR,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Consumer<HomeBloc>(
+                  builder: (context, value, child) => BannerSectionView(
+                      movieList: value.mPopularMovieList?.take(5).toList() ?? []),
+                ),
+                const SizedBox(height: MARGIN_MEDIUM_2x),
+                Consumer<HomeBloc>(
+                  builder: (context, value, child) => BestPopularFilmsAndSerialsSectionView(
+                    (movieId) => navigationToMovieDetailsPage(context, movieId),
+                    getNowPlayingMovieList: value.mNowPlayingMovieList,
+                  ),
+                ),
+                const SizedBox(height: MARGIN_MEDIUM_2x),
+                const CheckMovieShowTimeSectionView(),
+                const SizedBox(height: MARGIN_LARGE),
+                Consumer<HomeBloc>(
+                  builder: (context, value, child) => GenreSectionView(
+                    (movieId) => navigationToMovieDetailsPage(context, movieId),
+                    genreList: value.mGenresList,
+                    movieList: value.mMoviesByGenreList,
+                    chooseGenre: (genreId) {
+                      if (genreId != null) {
+                        value.onTapGenre(genreId);
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: MARGIN_LARGE),
+                Consumer<HomeBloc>(
+                  builder: (context, value, child) => ShowCaseSectionView(
+                    movieList: value.mTopRatedMovieList ?? [],
+                  ),
+                ),
+                const SizedBox(height: MARGIN_LARGE),
+                Consumer<HomeBloc>(
+                  builder: (context, value, child) => ActorsAndCreatorsView(
+                    titleText: BEST_ACTOR_TITLE,
+                    seeMoreText: BEST_ACTOR_SEE_MORE,
+                    actorList: value.mActorsList ?? [],
+                  ),
+                ),
+                //const SizedBox(height: MARGIN_LARGE),
+              ],
+            ),
           ),
         ),
       ),
