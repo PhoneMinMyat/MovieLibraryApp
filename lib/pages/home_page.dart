@@ -19,7 +19,6 @@ import 'package:provider/provider.dart';
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
-  
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -52,30 +51,40 @@ class HomePage extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Consumer<HomeBloc>(
-                  builder: (context, value, child) => BannerSectionView(
-                      movieList: value.mPopularMovieList?.take(5).toList() ?? []),
+                Selector<HomeBloc, List<MovieVO>?>(
+                  selector: (context, bloc) => bloc.mPopularMovieList,
+                  builder: (context, popularMovieList, child) =>
+                      BannerSectionView(
+                          movieList: popularMovieList?.take(5).toList() ?? []),
                 ),
                 const SizedBox(height: MARGIN_MEDIUM_2x),
-                Consumer<HomeBloc>(
-                  builder: (context, value, child) => BestPopularFilmsAndSerialsSectionView(
+                Selector<HomeBloc, List<MovieVO>?>(
+                  selector: (context, bloc) => bloc.mNowPlayingMovieList,
+                  builder: (context, nowPlayingMovieList, child) =>
+                      BestPopularFilmsAndSerialsSectionView(
                     (movieId) => navigationToMovieDetailsPage(context, movieId),
-                    getNowPlayingMovieList: value.mNowPlayingMovieList,
+                    getNowPlayingMovieList: nowPlayingMovieList,
                   ),
                 ),
                 const SizedBox(height: MARGIN_MEDIUM_2x),
                 const CheckMovieShowTimeSectionView(),
                 const SizedBox(height: MARGIN_LARGE),
-                Consumer<HomeBloc>(
-                  builder: (context, value, child) => GenreSectionView(
-                    (movieId) => navigationToMovieDetailsPage(context, movieId),
-                    genreList: value.mGenresList,
-                    movieList: value.mMoviesByGenreList,
-                    chooseGenre: (genreId) {
-                      if (genreId != null) {
-                        value.onTapGenre(genreId);
-                      }
-                    },
+                Selector<HomeBloc, List<GenreVO>?>(
+                  selector: (context, bloc) => bloc.mGenresList,
+                  builder: (context, genreList, child) => Selector<HomeBloc, List<MovieVO>?>(
+                    selector: (context, bloc) => bloc.mMoviesByGenreList,
+                    builder: (context, movieByGenreList, child) => GenreSectionView(
+                      (movieId) => navigationToMovieDetailsPage(context, movieId),
+                      genreList: genreList,
+                      movieList: movieByGenreList,
+                      chooseGenre: (genreId) {
+                        if (genreId != null) {
+                          //HomeBloc bloc = HomeBloc();
+                          HomeBloc bloc = Provider.of<HomeBloc>(context, listen: false);
+                          bloc.onTapGenre(genreId);
+                        }
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(height: MARGIN_LARGE),
