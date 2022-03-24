@@ -11,6 +11,7 @@ import 'package:movie_app/viewitems/banner_view.dart';
 import 'package:movie_app/viewitems/movie_view.dart';
 import 'package:movie_app/viewitems/showcase_item_view.dart';
 import 'package:movie_app/widgets/actors_and_creators_view.dart';
+import 'package:movie_app/widgets/title_and_movie_list_view.dart';
 import 'package:movie_app/widgets/title_text.dart';
 import 'package:movie_app/widgets/title_with_underlined_see_more_text_view.dart';
 import 'package:movie_app/widgets/underlined_seemore_text.dart';
@@ -61,9 +62,14 @@ class HomePage extends StatelessWidget {
                 Selector<HomeBloc, List<MovieVO>?>(
                   selector: (context, bloc) => bloc.mNowPlayingMovieList,
                   builder: (context, nowPlayingMovieList, child) =>
-                      BestPopularFilmsAndSerialsSectionView(
+                      TitleAndMovieListView(
                     (movieId) => navigationToMovieDetailsPage(context, movieId),
-                    getNowPlayingMovieList: nowPlayingMovieList,
+                    title: HOMEPAGE_BEST_POPULAR_FILMS_AND_SERIALS,
+                    movieList: nowPlayingMovieList,
+                    onMovieListReachedEnd: (){
+                      HomeBloc bloc = Provider.of<HomeBloc>(context, listen: false);
+                      bloc.onNowPlayingMovieListReachedEnd();
+                    },
                   ),
                 ),
                 const SizedBox(height: MARGIN_MEDIUM_2x),
@@ -254,35 +260,7 @@ class GenreSectionView extends StatelessWidget {
   }
 }
 
-class BestPopularFilmsAndSerialsSectionView extends StatelessWidget {
-  final Function(int?) movieOnTap;
-  final List<MovieVO>? getNowPlayingMovieList;
-  const BestPopularFilmsAndSerialsSectionView(
-    this.movieOnTap, {
-    required this.getNowPlayingMovieList,
-    Key? key,
-  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-            padding: const EdgeInsets.only(left: MARGIN_MEDIUM_2x),
-            child:
-                const TitleText(text: HOMEPAGE_BEST_POPULAR_FILMS_AND_SERIALS)),
-        const SizedBox(
-          height: MARGIN_MEDIUM_2x,
-        ),
-        HorizontalMovieListView(
-          (movieId) => movieOnTap(movieId),
-          movieList: getNowPlayingMovieList,
-        ),
-      ],
-    );
-  }
-}
 
 class HorizontalMovieListView extends StatelessWidget {
   final Function(int?) movieOnTap;

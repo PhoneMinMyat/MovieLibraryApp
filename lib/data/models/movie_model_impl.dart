@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:movie_app/data/models/movie_model.dart';
 import 'package:movie_app/data/vos/genre_vo.dart';
@@ -29,8 +28,8 @@ class MovieModelImpl extends MovieModel {
 
   final MovieDataAgent _dataAgent = RetrofitDataAgentImpl();
   @override
-  void getNowPlayingMovies() {
-    _dataAgent.getNowPlayingMovies(1).then((movies) async {
+  void getNowPlayingMovies(int pageIndex) {
+    _dataAgent.getNowPlayingMovies(pageIndex).then((movies) async {
       List<MovieVO>? nowPlayingMovieList = movies?.map((movie) {
         movie.isNowPlaying = true;
         movie.isPopular = false;
@@ -102,39 +101,56 @@ class MovieModelImpl extends MovieModel {
   ///Database
 
   @override
-  Future<List<MovieVO>> getNowPlayingMoviesFromDatabase() {
-    getNowPlayingMovies();
-    return Future.value(mMovieDao.getNowPlayingMovie());
+  Stream<List<MovieVO>> getNowPlayingMoviesFromDatabase() {
+    getNowPlayingMovies(1);
+    return mMovieDao
+        .getAllMoviesEventStream()
+        .startWith(mMovieDao.getNowPlayingMoviesStream())
+        .map((event) => mMovieDao.getNowPlayingMovie());
   }
 
   @override
-  Future<List<MovieVO>> getPopularMoviesFromDatabase() {
+  Stream<List<MovieVO>> getPopularMoviesFromDatabase() {
     getPopularMovies();
-    return Future.value(mMovieDao.getPopularMovies());
-        
+    return mMovieDao
+        .getAllMoviesEventStream()
+        .startWith(mMovieDao.getPopularMoviesStream())
+        .map((event) => mMovieDao.getPopularMovies());
   }
 
   @override
-  Future<List<MovieVO>> getTopRatedMoviesFromDatabase() {
+  Stream<List<MovieVO>> getTopRatedMoviesFromDatabase() {
     getTopRatedMovies();
-    return Future.value(mMovieDao.getTopRatedMovies());
+    return mMovieDao
+        .getAllMoviesEventStream()
+        .startWith(mMovieDao.getTopRatedMoviesStream())
+        .map((event) => mMovieDao.getTopRatedMovies());
   }
 
   @override
-  Future<List<ActorVO>> getActorsFromDatabase() {
+  Stream<List<ActorVO>> getActorsFromDatabase() {
     getActors();
-    return Future.value(mActorDao.getAllActors());
+    return mActorDao
+        .getAllActorsEventStream()
+        .startWith(mActorDao.getAllActorsEventStream())
+        .map((event) => mActorDao.getAllActors());
   }
 
   @override
-  Future<List<GenreVO>> getGenresFromDatabase() {
+  Stream<List<GenreVO>> getGenresFromDatabase() {
     getGenres();
-    return Future.value(mGenreDao.getAllGenres());
+    return mGenreDao
+        .getGenreEventStream()
+        .startWith(mGenreDao.getAllGenresStream())
+        .map((event) => mGenreDao.getAllGenres());
   }
 
   @override
-  Future<MovieVO?> getMovieDetailsFromDatabase(int movieId) {
+  Stream<MovieVO?> getMovieDetailsFromDatabase(int movieId) {
     getMovieDetails(movieId);
-    return Future.value(mMovieDao.getSingleMovieById(movieId));
+    return mMovieDao
+        .getAllMoviesEventStream()
+        .startWith(mMovieDao.getMovieDetailsByMovieIDStream(movieId))
+        .map((event) => mMovieDao.getMovieDetails(movieId));
   }
 }

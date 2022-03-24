@@ -78,8 +78,16 @@ class MovieDao {
     return Stream.value(getTopRatedMovies());
   }
 
+  MovieVO getMovieDetails(int movieId){
+    if(getSingleMovieById(movieId)?.id != null){
+      return getSingleMovieById(movieId) ?? MovieVO();
+    }else{
+      return MovieVO();
+    }
+  }
+
   Stream<MovieVO?> getMovieDetailsByMovieIDStream(int movieId) {
-    return Stream.value(getSingleMovieById(movieId));
+    return Stream.value(getMovieDetails(movieId));
   }
 
   Box<MovieVO> getMovieBox() {

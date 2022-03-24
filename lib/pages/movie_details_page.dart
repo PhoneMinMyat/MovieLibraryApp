@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app/bloc/details_page_bloc.dart';
-import 'package:movie_app/data/models/movie_model.dart';
-import 'package:movie_app/data/models/movie_model_impl.dart';
 import 'package:movie_app/data/vos/actor_vo.dart';
 import 'package:movie_app/data/vos/movie_vo.dart';
 import 'package:movie_app/network/api_constants.dart';
@@ -13,14 +11,27 @@ import 'package:movie_app/widgets/actors_and_creators_view.dart';
 import 'package:movie_app/widgets/gradient_view.dart';
 import 'package:movie_app/widgets/image_network_with_placeholder.dart';
 import 'package:movie_app/widgets/rating_view.dart';
+import 'package:movie_app/widgets/title_and_movie_list_view.dart';
 import 'package:movie_app/widgets/title_text.dart';
 import 'package:provider/provider.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 class MovieDetailsPage extends StatelessWidget {
   final int movieId;
 
   const MovieDetailsPage({required this.movieId, Key? key}) : super(key: key);
+
+  void navigationToMovieDetailsPage(BuildContext context, int? movieId) {
+    if (movieId != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MovieDetailsPage(
+            movieId: movieId,
+          ),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +93,19 @@ class MovieDetailsPage extends StatelessWidget {
                         actorList: crewList,
                       ),
                     ),
+                    const SizedBox(
+                      height: MARGIN_LARGE,
+                    ),
+                    Selector<DetailsPageBloc, List<MovieVO>?>(
+                      selector: (context, bloc) => bloc.mRelativeMovieList,
+                      builder: (context, mRelativeMovieList, child) =>
+                          TitleAndMovieListView(
+                              (movieId) => navigationToMovieDetailsPage(
+                                  context, movieId),
+                              movieList: mRelativeMovieList,
+                              title: MOVIE_DETAIL_SCREEN_RELATIVE_MOVIES,
+                              onMovieListReachedEnd: (){},),
+                    )
                   ]),
                 ),
               ],

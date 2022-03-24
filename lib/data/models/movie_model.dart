@@ -4,7 +4,7 @@ import 'package:movie_app/data/vos/movie_vo.dart';
 
 abstract class MovieModel {
   //Network
-  void getNowPlayingMovies();
+  void getNowPlayingMovies(int pageIndex);
   void getPopularMovies();
   void getTopRatedMovies();
   void getActors();
@@ -14,10 +14,10 @@ abstract class MovieModel {
   Future<List<List<ActorVO>?>> getCreditByMovie(int movieId);
 
   //Database
-  Future<List<MovieVO>> getNowPlayingMoviesFromDatabase();
-  Future<List<MovieVO>> getPopularMoviesFromDatabase();
-  Future<List<MovieVO>> getTopRatedMoviesFromDatabase();
-  Future<List<ActorVO>> getActorsFromDatabase();
-  Future<List<GenreVO>> getGenresFromDatabase();
-  Future<MovieVO?> getMovieDetailsFromDatabase(int movieId);
+  Stream<List<MovieVO>> getNowPlayingMoviesFromDatabase();
+  Stream<List<MovieVO>> getPopularMoviesFromDatabase();
+  Stream<List<MovieVO>> getTopRatedMoviesFromDatabase();
+  Stream<List<ActorVO>> getActorsFromDatabase();
+  Stream<List<GenreVO>> getGenresFromDatabase();
+  Stream<MovieVO?> getMovieDetailsFromDatabase(int movieId);
 }

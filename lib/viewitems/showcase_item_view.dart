@@ -39,7 +39,7 @@ class ShowCaseViewItem extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         fontSize: TEXT_REGULAR_3x),
                   ),
-                  SizedBox(
+                const  SizedBox(
                     height: MARGIN_MEDIUM,
                   ),
                   TitleText(text: movie.releaseDate ?? '')

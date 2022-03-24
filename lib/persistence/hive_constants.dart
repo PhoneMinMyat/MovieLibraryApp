@@ -1,4 +1,6 @@
 //Hive Type Id
+// ignore_for_file: constant_identifier_names
+
 const int HIVE_TYPE_ID_ACTOR_VO = 1;
 const int HIVE_TYPE_ID_COLLECTION_VO = 2;
 const int HIVE_TYPE_ID_COUNTRY_VO = 3;

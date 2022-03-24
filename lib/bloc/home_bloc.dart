@@ -17,27 +17,30 @@ class HomeBloc extends ChangeNotifier {
   //MovieModel
   final MovieModel _mMovieModel = MovieModelImpl();
 
+  //Variables
+  int nowPlayinMoviePage = 1;
+
   HomeBloc() {
     //Now Playing
-    _mMovieModel.getNowPlayingMoviesFromDatabase().then((movieList) {
+    _mMovieModel.getNowPlayingMoviesFromDatabase().listen((movieList) {
       mNowPlayingMovieList = movieList;
       notifyListeners();
-    }).catchError((error) {});
+    }).onError((error) {});
 
     //Popular Movies
-    _mMovieModel.getPopularMoviesFromDatabase().then((movieList) {
+    _mMovieModel.getPopularMoviesFromDatabase().listen((movieList) {
       mPopularMovieList = movieList;
       notifyListeners();
-    }).catchError((error) {});
+    }).onError((error) {});
 
     //TopRated Movies
-    _mMovieModel.getTopRatedMoviesFromDatabase().then((movieList) {
+    _mMovieModel.getTopRatedMoviesFromDatabase().listen((movieList) {
       mTopRatedMovieList = movieList;
       notifyListeners();
-    }).catchError((error) {});
+    }).onError((error) {});
 
     //Genres
-    _mMovieModel.getGenresFromDatabase().then((genreList) {
+    _mMovieModel.getGenresFromDatabase().listen((genreList) {
       mGenresList = genreList;
       //Movies By Genres
       _mMovieModel.getMoviesByGenre(genreList.first.id ?? 0).then((movieList) {
@@ -45,13 +48,13 @@ class HomeBloc extends ChangeNotifier {
         notifyListeners();
       }).catchError((error) {});
       notifyListeners();
-    }).catchError((error) {});
+    }).onError((error) {});
 
     //Actors
-    _mMovieModel.getActorsFromDatabase().then((actorList) {
+    _mMovieModel.getActorsFromDatabase().listen((actorList) {
       mActorsList = actorList;
       notifyListeners();
-    }).catchError((error) {});
+    }).onError((error) {});
   }
 
   void onTapGenre(int genreId) {
@@ -63,5 +66,10 @@ class HomeBloc extends ChangeNotifier {
       mMoviesByGenreList = movieList;
       notifyListeners();
     }).catchError((error) {});
+  }
+
+  void onNowPlayingMovieListReachedEnd(){
+    nowPlayinMoviePage += 1;
+    _mMovieModel.getNowPlayingMovies(nowPlayinMoviePage);
   }
 }

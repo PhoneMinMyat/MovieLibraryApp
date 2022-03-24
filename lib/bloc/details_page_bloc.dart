@@ -9,18 +9,27 @@ class DetailsPageBloc extends ChangeNotifier {
   MovieVO? mMovie;
   List<ActorVO>? mCastList;
   List<ActorVO>? mCrewList;
+  List<MovieVO>? mRelativeMovieList;
 
   //Movie Model
   final MovieModel _mMovieModel = MovieModelImpl();
 
   DetailsPageBloc(int movieId) {
     //Movie Details
-    _mMovieModel.getMovieDetailsFromDatabase(movieId).then((movie) {
+    _mMovieModel.getMovieDetailsFromDatabase(movieId).listen((movie) {
       if (movie != null) {
         mMovie = movie;
+        print(mMovie.toString());
+        //Relative Movies
+        _mMovieModel
+            .getMoviesByGenre(mMovie?.genres?.first.id ?? 0)
+            .then((relativeMovieList) {
+          mRelativeMovieList = relativeMovieList;
+          notifyListeners();
+        }).catchError((error) => print(error));
         notifyListeners();
       }
-    }).catchError((error) {});
+    }).onError((error) {});
 
     //Cast and Crew
     _mMovieModel.getCreditByMovie(movieId).then((castAndCrewList) {
